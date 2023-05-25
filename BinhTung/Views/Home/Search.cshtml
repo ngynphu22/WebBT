@@ -1,0 +1,46 @@
+﻿@model BinhTung.ViewModel.ProductSearchViewModel
+@using PagedList.Mvc
+@{
+    ViewBag.Title = "Tìm kiếm";
+}
+<div class="bg-breadcrumb">
+    <div class="container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index")"><i class="fal fa-home mr-1"></i> Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Từ khóa: @Model.Keywords</li>
+        </ol>
+    </div>
+</div>
+<div class="container py-lg-4 py-3">
+    <div class="row row-gutter-8">
+        <div class="col-sm-12 col-lg-3">
+            @Html.Action("MenuProduct")
+        </div>
+        <div class="col-sm-12 col-lg-9">
+            <h1 class="title-category main mb-lg-4 mb-3">
+                Từ khóa: @Model.Keywords
+            </h1>
+            @if (Model.Products.Any())
+            {
+                <div class="row row-gutter-8">
+                    @foreach (var product in Model.Products)
+                    {
+                        <div class="col-sm-12 col-lg-4 mb-3">
+                            @Html.Partial("_ItemProduct", product)
+                        </div>
+                    }
+                </div>
+                if (Model.Products.PageCount > 1)
+                {
+                    <div class="text-right mt-lg-4 mt-3 py-0 px-2">
+                        @Html.PagedListPager(Model.Products, page => Url.Action("Search", new { categoryId = Model.CategoryId, keywords = Model.Keywords, page }))
+                    </div>
+                }
+            }
+            else
+            {
+                <div class=" alert alert-info small mt-3">Nội dung hiện chưa được cập nhật.Vui lòng quay lại sau !!!</div>
+            }
+        </div>
+    </div>
+</div>

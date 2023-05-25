@@ -1,0 +1,166 @@
+﻿@model BinhTung.ViewModel.HomeViewModel
+@using BinhTung.Models
+@{
+    var config = (ConfigSite)HttpContext.Current.Application["ConfigSite"];
+    ViewBag.Title = config.Title;
+    ViewBag.Description = config.Description;
+
+    ViewBag.Canonical = Request.Url?.GetLeftPart(UriPartial.Authority) + Url.Action("Index");
+
+    if (Model.Banners.Any(l => l.GroupId == 1))
+    {
+        var fb = Model.Banners.First(l => l.GroupId == 1);
+        ViewBag.ImagShare = Request.Url?.GetLeftPart(UriPartial.Authority) + Path.Combine("/images/banners/", fb.Image);
+    }
+}
+@if (Model.Banners.Any(l => l.GroupId == 1))
+{
+    <div class="owl-carousel banner-owl">
+        @foreach (var banner in Model.Banners.Where(l => l.GroupId == 1))
+        {
+            <div class="slide-owl">
+                <a href="@banner.Url">
+                    <img class="img-banner img-fluid" src="@Path.Combine("/images/banners/", banner.Image)" alt="@banner.BannerName" />
+                </a>
+            </div>
+        }
+    </div>
+}
+<div class="container pt-lg-5 pt-3">
+    <div class="row pb-lg-0 pb-4">
+        <div class="col-sm-12 col-md-6 col-lg-6" data-aos="fade-right" data-aos-duration="700">
+            @if (config.AboutImage != null)
+            {
+                <div class="img-about">
+                    <img class="img-fluid" src="@Path.Combine("/images/configs/", config.AboutImage)" alt="@config.AboutImage" />
+                    <a class="btn-play" target="_blank" href="@config.VideoUrl">
+                        <i class="fad fa-play"></i>
+                    </a>
+                </div>
+            }
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 about-text" data-aos="fade-left" data-aos-duration="700">
+            @if (config.AboutText != null)
+            {
+                @Html.Raw(config.AboutText)
+            }
+            <a href="@config.FileUrl" target="_blank" class="btn btn-style mr-lg-3 mr-2">
+                <img src="~/Content/images/logo-icon/list.svg" alt="list" /> <span>Hồ sơ pháp lý</span>
+            </a>
+            <a href="@config.HistoryUrl" target="_blank" class="btn btn-style">
+                <img src="~/Content/images/logo-icon/pt.svg" alt="bars" /> <span>Lịch Sử hình thành và Phát triển</span>
+            </a>
+        </div>
+    </div>
+    @if (Model.ItemSpecialProducts.Any())
+    {
+        foreach (var category in Model.ItemSpecialProducts)
+        {
+            <h2 class="title mt-lg-5 mt-3" data-aos="fade-right" data-aos-duration="700">@category.ProductCategory.CategoryName</h2>
+            if (category.Products.Any())
+            {
+                <div class="row row-gutter-8" data-aos="fade-left" data-aos-duration="700">
+                    @foreach (var product in category.Products)
+                    {
+                        <div class="col-6 col-sm-12 col-md-6 col-lg-3 mb-3">
+                            @Html.Partial("_ItemProduct", product)
+                        </div>
+                    }
+                </div>
+            }
+        }
+    }
+    <div class="row mt-lg-5 mt-3" data-aos="fade-up" data-aos-duration="700">
+        <div class="col-sm-12 col-lg-3 mb-3">
+            @Html.Action("MenuProduct")
+        </div>
+        <div class="col-sm-12 col-lg-9">
+            @if (Model.ItemHomeProducts.Any())
+            {
+                foreach (var category in Model.ItemHomeProducts)
+                {
+                    if (!string.IsNullOrEmpty(category.ProductCategory.Image))
+                    {
+                        <img class="img-cover img-fluid" src="@Path.Combine("/images/productCategory/", category.ProductCategory.Image)" alt="@category.ProductCategory.CategoryName" />
+                    }
+                    <div class="box-name-category">
+                        @category.ProductCategory.CategoryName
+                    </div>
+                    if (category.Products.Any())
+                    {
+                        <div class="box-border mb-lg-4 mb-3">
+                            <div class="row row-gutter-10">
+                                @foreach (var product in category.Products)
+                                {
+
+                                    <div class="col-6 col-sm-12 col-md-6 col-lg-3 text-center mb-lg-4 mb-3">
+                                        <a href="@Url.Action("ProductDetail", new { url = product.Url })">
+                                            <div class="item-img hover mb-2">
+                                                @if (product.ListImage != null)
+                                                {
+                                                    <img class="img-fluid img img--productincategory" src="@Path.Combine("/images/products/", product.ListImage.Split(',')[0])" alt="@product.Name" />
+                                                }
+                                            </div>
+                                        </a>
+                                        <a class="name-product" href="@Url.Action("ProductDetail", new { url = product.Url })">@product.Name</a>
+                                    </div>
+                                }
+                            </div>
+                            <div class="text-center">
+                                <a href="@Url.Action("ProductCategory", new { url = category.ProductCategory.Url })" class="btn btn-style mb-3">XEM THÊM</a>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>
+</div>
+<div class="bg-gray py-lg-5 py-3">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-lg-6" data-aos="fade-right" data-aos-duration="1000">
+                @if (Model.Feedbacks.Any())
+                {
+                    <h2 class="title text-left mt-lg-5">
+                        <span class="sub-title">Tại sao khách hàng lựa chọn chúng tôi?</span>
+                        Đánh giá của khách hàng
+                    </h2>
+                    <div class="owl-carousel feedback-owl mt-lg-5 mt-3 pr-lg-5">
+                        @foreach (var feedback in Model.Feedbacks)
+                        {
+                            <div class="box-feedback pr-lg-5">
+                                <img class="img-fluid img-quote" src="~/Content/images/logo-icon/quote.svg" alt="error" />
+                                @feedback.Content
+                                <div class="media media-feedback mt-lg-4 mt-3">
+                                    @if (feedback.Image != null)
+                                    {
+                                        <img class="mr-3 img img--feedback" src="@Path.Combine("/images/feedbacks/", feedback.Image)" alt="@feedback.Name">
+                                    }
+                                    <div class="media-body">
+                                        <div class="name mt-2">@feedback.Name</div>
+                                        @feedback.Classify
+                                    </div>
+                                </div>
+                                <div class="star">
+                                    @for (int j = 0; j < 5; j++)
+                                    {
+                                        <i class="fas fa-star"></i>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="col-sm-12 col-lg-6 pt-lg-0 pt-3">
+                @Html.Action("ContactForm")
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        IndexJs();
+    </script>
+}

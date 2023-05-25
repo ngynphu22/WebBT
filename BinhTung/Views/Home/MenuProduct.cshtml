@@ -1,0 +1,76 @@
+﻿@model BinhTung.ViewModel.MenuProductViewModel
+@using BinhTung.Models
+@{
+    var config = (ConfigSite)HttpContext.Current.Application["ConfigSite"];
+    var a = 1;
+}
+<div class="border-blue">
+    <div class="title-category">
+        Danh mục sản phẩm
+    </div>
+    <div class="category" id="category">
+        @foreach (var category in Model.ProductCategories.Where(l => l.ParentId == null))
+        {
+            var hasChild = Model.ProductCategories.Any(l => l.ParentId == category.Id);
+            <div class="card">
+                <div class="card-header" data-toggle="collapse" data-target="#cat-@a">
+                    <a href="@Url.Action("ProductCategory", new { url = category.Url })">@category.CategoryName</a>
+                    @if (hasChild)
+                    {
+                        <i class="fal fa-chevron-down" data-toggle="collapse" data-target="#cat-@a" aria-controls="#cat-@a"></i>
+                    }
+                </div>
+                @if (hasChild)
+                {
+                    <div id="cat-@a" class="collapse show" @*data-parent="#category"*@>
+                        <div class="card-body">
+                            <ul class="ul-block ul-child-category">
+                                @foreach (var child in Model.ProductCategories.Where(l => l.ParentId == category.Id))
+                                {
+                                    <li><a href="@Url.Action("ProductCategory", new { url = child.Url })"> @child.CategoryName</a></li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                }
+            </div>
+            a++;
+        }
+    </div>
+</div>
+<div class="border-blue mt-lg-4 mt-3">
+    @if (Model.Articles.Any())
+    {
+        <div class="title-category">
+            TIN TỨC MỚI NHẤT
+        </div>
+        foreach (var article in Model.Articles)
+        {
+            <div class="media media-recently">
+                @if (article.Image != null)
+                {
+                    <a href="@Url.Action("ArticleDetail", new { url = article.Url })">
+                        <img src="@Path.Combine("/images/articles/", article.Image)" class="img img--recently img-fluid mr-2" alt="@article.Subject" />
+                    </a>
+                }
+                <div class="media-body content">
+                    <a href="@Url.Action("ArticleDetail", new { url = article.Url })" class="content__name-recently truncate-h pt-2" data-line="2">
+                        @article.Subject
+                    </a>
+                    <div class="content__calendar pt-2">
+                        @article.CreateDate.ToString("dd/MM/yyyy")
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+<div class="border-blue mt-lg-4 mt-3">
+    <div class="title-category">
+        Liên hệ
+    </div>
+    <ul class="ul-block ul-info-contact">
+        <li><span><i class="fal fa-phone-alt mr-1"></i> Hotline:</span><a href="tel:@config.Hotline"> @config.Hotline</a></li>
+        <li><span><i class="fal fa-envelope mr-1"></i> Email:</span><a href="mailto:@config.Email"> @config.Email</a></li>
+    </ul>
+</div>

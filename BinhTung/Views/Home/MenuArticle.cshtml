@@ -1,0 +1,53 @@
+﻿@model BinhTung.ViewModel.MenuArticleViewModel
+@using BinhTung.Models
+@{
+    var config = (ConfigSite)HttpContext.Current.Application["ConfigSite"];
+}
+<div class="box-border mt-lg-0 mt-3">
+    <form action="@Url.Action("SearchArticle")" method="get" class="search-article">
+        <div class="input-group">
+            <input type="text" name="keywords" required="" value="@Request.QueryString["keywords"]" id="suggestBox" class="form-control" maxlength="128" autocomplete="off" placeholder="Tìm kiếm">
+            <button type="submit" class="submit"><i class="far fa-search"></i></button>
+        </div>
+    </form>
+    <div class="title-category mt-3">
+        Danh mục bài viết
+    </div>
+    <ul class="ul-block ul-catalog my-3">
+        @foreach (var category in Model.ArticleCategories)
+        {
+            <li><a href="@Url.Action("ArticleCategory", new { url = category.Url })"> @category.CategoryName</a></li>
+        }
+    </ul>
+    @if (config.Facebook != null)
+    {
+        <div class="fb-page" data-href="@config.Facebook" data-tabs="" data-width="500px" data-height="400px" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true">
+            <blockquote cite="@config.Facebook" class="fb-xfbml-parse-ignore"><a href="@config.Facebook">binhtung</a></blockquote>
+        </div>
+    }
+    @if (Model.Articles.Any())
+    {
+        <div class="title-category mt-3">
+            TIN TỨC MỚI NHẤT
+        </div>
+        foreach (var article in Model.Articles)
+        {
+            <div class="media media-recently">
+                @if (article.Image != null)
+                {
+                    <a href="@Url.Action("ArticleDetail", new { url = article.Url })">
+                        <img src="@Path.Combine("/images/articles/", article.Image)" class="img img--recently img-fluid mr-2" alt="@article.Subject" />
+                    </a>
+                }
+                <div class="media-body content">
+                    <a href="@Url.Action("ArticleDetail", new { url = article.Url })" class="content__name-recently truncate-h pt-2" data-line="2">
+                        @article.Subject
+                    </a>
+                    <div class="content__calendar pt-2">
+                        @article.CreateDate.ToString("dd/MM/yyyy")
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

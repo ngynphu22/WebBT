@@ -1,0 +1,75 @@
+﻿@model BinhTung.Models.Feedback
+@{
+    ViewBag.Title = "Cập nhật phản hồi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    .form_name {
+        width: 100px;
+    }
+</style>
+
+<a class="btn quick-link" href="@Url.Action("ListFeedback","Contact")"><i class="far fa-list mr-1"></i> Danh sách phản hồi</a>
+<div class="box_content">
+    @using (Html.BeginForm("UpdateFeedback", "Contact", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(model => model.Id)
+        <table class="form_table">
+            <tr>
+                <td class="form_name">@Html.LabelFor(model => model.Name)</td>
+                <td class="form_text">@Html.EditorFor(model => model.Name)</td>
+            </tr>
+            <tr>
+                <td class="form_name">@Html.LabelFor(model => model.Image)</td>
+                <td class="form_text">
+                    @Html.TextBoxFor(model => model.Image, new { type = "file" })
+                </td>
+            </tr>
+            @if (Model.Image != null)
+            {
+                <tr id="ImgPreview">
+                    <td class="form_name"></td>
+                    <td class="form_text">
+                        @if (Model == null)
+                        {
+                            <p>Không có ảnh</p>
+                        }
+                        else
+                        {
+                            <img src="@Path.Combine("/images/feedbacks/", Model.Image)?w=100" alt="" width="100" />
+                        }
+                        <br /><br /><a href="javascript:;" onclick="$('#ImgPreview').hide(); $('#CurrentFile').val('');">
+                            <img src="/Content/admin/icon-delete-red.png" alt="" style="        vertical-align: middle;
+        margin-top: 0;
+        height: 10px;" /> Xóa ảnh
+                        </a>
+                        <input type="hidden" name="CurrentFile" id="CurrentFile" value="@Model.Image" />
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td class="form_name">@Html.LabelFor(model => model.Content)</td>
+                <td class="form_text">@Html.EditorFor(model => model.Content)</td>
+            </tr>
+            <tr>
+                <td class="form_name">@Html.LabelFor(model => model.Classify)</td>
+                <td class="form_text">@Html.EditorFor(model => model.Classify)</td>
+            </tr>
+            <tr>
+                <td class="form_name">@Html.LabelFor(model => model.Sort)</td>
+                <td class="form_text">@Html.EditorFor(model => model.Sort)</td>
+            </tr>
+            <tr>
+                <td class="form_name">@Html.LabelFor(model => model.Active)</td>
+                <td class="form_text">@Html.CheckBoxFor(model => model.Active, new { @checked = "checked" })</td>
+            </tr>
+            <tr>
+                <td class="form_name"></td>
+                <td class="form_text">
+                    <input type="submit" class="btn quick-link" value="Cập nhật" />
+                </td>
+            </tr>
+        </table>
+    }
+</div>

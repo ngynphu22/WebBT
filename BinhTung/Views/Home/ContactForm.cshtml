@@ -1,0 +1,30 @@
+﻿@model BinhTung.Models.Contact
+<div class="contact aos-init aos-animate" data-aos="fade-left" data-aos-duration="1100" data-aos-delay="200">
+    <div class="title title-contact-index mb-2">
+        Vui lòng điền đầy đủ thông tin
+    </div>
+    <p>Luôn sẵn sàng giải đáp mọi thắc mắc của bạn</p>
+    <form id="contact_form" class="contact-form">
+        @Html.ValidationSummary(true)
+        @Html.AntiForgeryToken()
+        <div class="form-row">
+            <div class="col">
+                @Html.TextBoxFor(model => model.Fullname, new { @class = "form-control", required = "", @placeholder = "Họ và tên" })
+                @Html.ValidationMessageFor(model => model.Fullname)
+            </div>
+            <div class="col">
+                @Html.TextBoxFor(model => model.Mobile, new { @class = "form-control", required = "", @placeholder = "Số điện thoại" })
+                @Html.ValidationMessageFor(model => model.Mobile)
+            </div>
+        </div>
+        @Html.TextBoxFor(model => model.Email, new { @class = "form-control", required = "", @placeholder = "Email" })
+        @Html.ValidationMessageFor(model => model.Email)
+        @Html.TextBoxFor(model => model.Address, new { @class = "form-control", required = "", @placeholder = "Địa chỉ" })
+        @Html.ValidationMessageFor(model => model.Address)
+        <div class="form-group">
+            @Html.TextAreaFor(model => model.Body, new { @class = "form-control", rows = 4, @placeholder = "Lời nhắn" })
+            @Html.ValidationMessageFor(model => model.Body)
+        </div>
+        <button type="submit" class="btn btn-style"> Gửi đi</button>
+    </form>
+</div>

@@ -1,0 +1,236 @@
+﻿@model BinhTung.ViewModel.ListProductViewModel
+@using PagedList.Mvc
+@{
+    ViewBag.Title = "Danh sách sản phẩm";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<h2>Danh sách sản phẩm</h2>
+@if (ViewBag.Result == "success")
+{
+    <div id="AlertBox" class="alert alert-success"><strong>Thêm mới sản phẩm thành công</strong></div>
+}
+@if (ViewBag.Result == "update")
+{
+    <div id="AlertBox" class="alert alert-success"><strong>Cập nhật sản phẩm thành công</strong></div>
+}
+<a class="btn quick-link" href="@Url.Action("Product")"><i class="fal fa-plus-circle mr-1"></i>Thêm sản phẩm</a>
+<div class="box_content">
+    <form action="@Url.Action("ListProduct")" method="get">
+        <div class="row">
+            <div class="col-3">
+                <label>Danh mục</label>
+                @Html.DropDownListFor(model => model.ParentId, Model.SelectCategories, "Tất cả sản phẩm", new { @class = "form_control", data_item = "root" })
+            </div>
+            <div class="col-3">
+                <label>Danh mục</label>
+                @Html.DropDownListFor(model => model.CatId, Model.ChildCategoryList, "Tất cả sản phẩm", new { @class = "form_control", data_item = "child" })
+            </div>
+            <div class="col-3">
+                <label>Từ khóa</label>
+                @Html.TextBoxFor(a => a.Name, new { @class = "form_control" })
+            </div>
+            <div class="col-3">
+                <label>Sắp xếp</label>
+                <select class="form_control" name="Sort">
+                    <option value="date-desc">Mới nhất</option>
+                    <option value="date-asc" @if (Model.Sort == "date-asc") { @Html.Raw("selected='selected'") }>Cũ nhất</option>
+                    <option value="sort-asc" @if (Model.Sort == "sort-asc") { @Html.Raw("selected='selected'") }>STT nhỏ nhất</option>
+                    <option value="sort-desc" @if (Model.Sort == "sort-desc") { @Html.Raw("selected='selected'") }>STT lớn nhất</option>
+                    <option value="hot-asc" @if (Model.Sort == "hot-asc") { @Html.Raw("selected='selected'") }>Sản phẩm nổi bật</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn-search">Tìm kiếm</button>
+        </div>
+    </form>
+    <p>Có tổng số <strong>@Model.Products.TotalItemCount</strong> sản phẩm</p>
+    <form id="productList">
+        <table class="list_table tablecenter table-striped">
+            <tbody>
+                <tr>
+                    <th style="width: 100px">STT</th>
+                    <th style="width: 50px">Hình ảnh</th>
+                    <th style="width: 350px">Tên sản phẩm</th>
+                    <th style="width: 130px">Danh mục</th>
+                    @*<th style="width: 130px">Thương hiệu</th>*@
+                    @*<th>Loại sản phẩm</th>*@
+                    @*<th>Giá sản phẩm</th>*@
+                    <th>Số lượng</th>
+                    <th>Hoạt động</th>
+                    <th style="width: 140px;">@*<button type="button" class="btn quick-link" style="background-color: #004767; margin: 0 auto; padding: 10px 15px;" onclick="updateAllProduct()">Cập nhật tất cả</button>*@</th>
+                </tr>
+                @foreach (var product in Model.Products)
+                {
+                    <tr data-id="@product.Id">
+                        <td>
+                            <input type="hidden" name="ProductId" value="@product.Id" />
+                            @*<input type="number" name="Sort" id="Sort" min="0" value="@product.Sort" class="form_control" style="width: 60px" />*@
+                            @Html.EditorFor(a => product.Sort)
+                        </td>
+                        <td>
+                            @if (product.ListImage != null)
+                            {
+                                <a href="@Url.Action("ProductDetail", "Home", new {proId = product.Id, name = Html.ConvertToUnSign(product.Name), catname = Html.ConvertToUnSign(product.ProductCategory.CategoryName)})" target="_blank"><img class="img-border" src="@Path.Combine("/images/products/", product.ListImage.Split(',')[0])?w=100" alt="" /></a>
+                            }
+                            else
+                            {
+                                @:NO PICTURE
+                            }
+                        </td>
+                        <td class="left">
+                            @*<p>
+                                    <a href="javascript:;" onclick="cloneProduct(@product.Id)" class="text-danger">Nhân đôi SP</a>
+                                </p>*@
+                            <p><a href="@Url.Action("UpdateProduct", new { proId = product.Id })"><strong>@product.Name</strong></a></p>
+                            @*@if (product.Code != null)
+                                {
+                                    <p>Code: @product.Code</p>
+                                }
+                                else
+                                {
+                                    <p>Code: N/A</p>
+                                }*@
+                            <p>
+                                @*BST nổi bật - @Html.EditorFor(model => product.Hot, new { htmlAttributes = new { id = "Hot" } }) /*@ Trang chủ - @Html.EditorFor(model => product.Home, new { htmlAttributes = new { id = "Home" } }) @*/ Nổi bật nhất - @Html.EditorFor(model => product.Hot, new { htmlAttributes = new { id = "Hot" } })*@
+                            </p>
+                        </td>
+                        <td>@product.ProductCategory.CategoryName</td>
+                        @*<td>
+                                @(product.Brand != null ? product.Brand.Name : "Chưa chọn thương hiệu")
+                            </td>*@
+                        @*<td>@Html.DisplayFor(a => product.ProductType)</td>*@
+                        <td>@Html.EditorFor(a => product.Quantity)</td>
+                        <td>
+                            @Html.EditorFor(model => product.Active, new { htmlAttributes = new { onclick = "updateStatus(" + product.Id + ")", id = "ProductStatus" } })<br />
+                            <span id="statusResult"></span>
+                        </td>
+                        <td>
+                            <a href="javascript:;" onclick="updateInfo(@product.Id)">Cập nhật</a> -
+                            @Html.ActionLink("Sửa", "UpdateProduct", new { proId = product.Id })
+                            - <a href="javascript:;" onclick="deleteProduct('@product.Id')" class="red-warring">Xóa</a>
+                        </td>
+                    </tr>
+                }
+                @if (Model.Products.PageCount > 1)
+                {
+                    <tr>
+                        @*<td colspan="9">@Html.PagedListPager(Model.Products, page => Url.Action("ListProduct", new { page, catId = Model.CategoryId, name = Model.Name }))</td>*@
+                        <td colspan="9">@Html.PagedListPager(Model.Products, page => Url.Action("ListProduct", new { page, catId = Model.CatId, parentId = Model.ParentId, name = Model.Name, sort = Model.Sort }))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </form>
+</div>
+@section scripts
+{
+    <script type="text/javascript">
+        function deleteProduct(id) {
+            if (confirm("Bạn có chắc chắn xóa bài viết này không?")) {
+                $.post("/ProductVcms/DeleteProduct", { proId: id }, function (data) {
+                    if (data) {
+                        $.toast({
+                            text: 'Xóa sản phẩm thành công',
+                            position: 'bottom-right',
+                            icon: 'success',
+                        })
+                        $("tr[data-id='" + id + "']").fadeOut();
+                    }
+                    else {
+                        $.toast({
+                            text: 'Quá trình thực hiện không thành công. Hãy thử lại',
+                            icon: 'error',
+                        })
+                    }
+                });
+            }
+        }
+        function cloneProduct(proId) {
+            $.post("/ProductVcms/CloneProduct",
+                { proId },
+                function (data) {
+                    if (data) {
+                        window.location.reload();
+                    } else {
+                        $.toast({
+                            text: 'Nhân đôi sẩn phẩm thành công',
+                            position: 'bottom-right',
+                            icon: 'success',
+                        })
+                    }
+                });
+        }
+        function updateStatus(id) {
+            var elm = $('tr[data-id="' + id + '"]');
+            var status = elm.find("#ProductStatus").prop("checked");
+
+            $.post("/ProductVcms/QuickUpdate", { proId: id, status },
+                function (data) {
+                    if (data) {
+                        elm.find("#statusResult").html("<strong>OK</strong>");
+                        elm.find("#statusResult strong").delay(1000).fadeOut();
+                    } else {
+                        $.toast({
+                            text: 'Quá trình thực hiện không thành công. Hãy thử lại',
+                            position: 'bottom-right',
+                            icon: 'error',
+                        })
+                        window.location.reload();
+                    };
+                });
+        }
+
+        function updateInfo(id) {
+            var elm = $('tr[data-id="' + id + '"]');
+            var sort = elm.find("#product_Sort").val();
+            var home = elm.find("input#Home").prop("checked");
+            var active = elm.find("input#ProductStatus").prop("checked");
+            var quantity = elm.find("#product_Quantity").val();
+            if (quantity <= 0) {
+                $.toast({
+                    text: 'Số lượng trong kho không hợp lệ.',
+                    position: 'bottom-right',
+                    icon: 'error',
+                })
+                return false;
+            }
+            $.post("/ProductVcms/QuickUpdate", { proId: id, quantity, sort, active, home },
+                function (data) {
+                    if (data) {
+                        $.toast({
+                            text: 'Cập nhật thành công',
+                            position: 'bottom-right',
+                            icon: 'success',
+                        })
+                    } else {
+                        $.toast({
+                            text: 'Quá trình thực hiện không thành công. Hãy thử lại',
+                            position: 'bottom-right',
+                            icon: 'error',
+                        })
+                        window.location.reload();
+                    };
+                });
+        }
+        function updateAllProduct() {
+            $.post("/ProductVcms/UpdateAllProduct", $("#productList").serialize(), function (data) {
+                if (data) {
+                    //alert("Cập nhật thành công");
+                    $.toast({
+                        text: 'Cập nhật thành công',
+                        position: 'bottom-right',
+                        icon: 'success',
+                    })
+                } else {
+                    //alert("Quá trình thực hiện không thành công. Hãy thử lại");
+                    $.toast({
+                        text: 'Quá trình thực hiện không thành công. Hãy thử lại',
+                        position: 'bottom-right',
+                        icon: 'error',
+                    })
+                }
+            });
+        }
+    </script>
+}

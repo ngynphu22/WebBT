@@ -1,0 +1,8 @@
+﻿@if (Model == null)
+{
+    <div>NO PICTURE</div>
+}
+else
+{
+    <img class="img-border" src="@Path.Combine("/images/productCategory/", Model)?w=150" alt="" style="object-fit: cover; width: 180px; height: 60px; background: #fff;" />
+}

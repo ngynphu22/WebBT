@@ -1,0 +1,66 @@
+﻿@model BinhTung.ViewModel.CategoryAticleViewModel
+@using PagedList.Mvc
+@{
+    ViewBag.Title = Model.Category.TitleMeta ?? Model.Category.CategoryName;
+    ViewBag.Description = Model.Category.DescriptionMeta ?? Model.Category.CategoryName;
+    ViewBag.Canonical = Request.Url?.GetLeftPart(UriPartial.Authority) + Url.Action("ArticleCategory", new { url = Model.Category.Url });
+}
+
+<div class="bg-breadcrumb">
+    <div class="container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index")"><i class="fal fa-home mr-1"></i> Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page"> @Model.Category.CategoryName</li>
+        </ol>
+    </div>
+</div>
+<div class="container py-lg-4 py-3">
+    <div class="row">
+        <div class="col-sm-12 col-lg-8 pr-lg-0">    
+            <h1 class="title-category main mb-lg-4 mb-3">
+                @Model.Category.CategoryName
+            </h1>
+            @if (Model.Articles.Any())
+            {
+                <div class="row row-gutter-10">
+                    @foreach (var article in Model.Articles)
+                    {
+                        <div class="col-sm-12 col-md-6 col-lg-6 mb-lg-4 mb-3">
+                            <div class="box-article">
+                                <div class="item-img">
+                                    @if (article.Image != null)
+                                    {
+                                        <a href="@Url.Action("ArticleDetail", new { url = article.Url })">
+                                            <img class="img img--article" src="@Path.Combine("/images/articles/", article.Image)" alt="@article.Subject" />
+                                        </a>
+                                    }
+                                </div>
+                                <div class="content p-3">
+                                    <div class="content__category">@article.ArticleCategory.CategoryName</div>
+                                    <a class="content__name-article truncate-h" data-line="2" href="@Url.Action("ArticleDetail", new { url = article.Url })">@article.Subject</a>
+                                    <p class="content__des pt-2 truncate-h" data-line="3">
+                                        @article.Description
+                                    </p>
+                                    <a href="@Url.Action("ArticleDetail", new { url = article.Url })" class="view-more">Xem thêm</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                if (Model.Articles.PageCount > 1)
+                {
+                    <div class="text-right mt-3">
+                        @Html.PagedListPager(Model.Articles, page => Url.Action("ArticleCategory", new { url = Model.Category.Url, page }))
+                    </div>
+                }
+            }
+            else
+            {
+                <p class=" alert alert-info small">Nội dung hiện chưa được cập nhật.Vui lòng quay lại sau !!!</p>
+            }
+        </div>
+        <div class="col-sm-12 col-lg-4 pl-lg-5">
+            @Html.Action("MenuArticle")
+        </div>
+    </div>
+</div>

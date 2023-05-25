@@ -1,0 +1,42 @@
+﻿@using BinhTung.Models
+@{
+    var config = (ConfigSite)HttpContext.Current.Application["ConfigSite"];
+    ViewBag.Title = "Liên hệ";
+    ViewBag.Canonical = Request.Url?.GetLeftPart(UriPartial.Authority) + Url.Action("Contact");
+}
+<div class="bg-breadcrumb">
+    <div class="container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index")"><i class="fal fa-home mr-1"></i> Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page"> Liên hệ</li>
+        </ol>
+    </div>
+</div>
+<div class="container py-lg-4 py-3">
+    <div class="box-border box-contact">
+        <div class="w-50">
+            <div class="box-contact-mini bg-radius p-3">
+                <h1 class="title"><span>Thông tin</span> Liên hệ với chúng tôi</h1>
+                <ul class="ul-block text-list my-lg-4 py-lg-2 my-3 overflow-hidden">
+                    <li><b>Địa chỉ</b><hr><p class="truncate-h" data-line="1">@config.Place</p></li>
+                    <li><b>Tên công ty</b><hr><p>@config.Title</p></li>
+                    <li><b>Email</b><hr><p>@config.Email</p></li>
+                    <li><b>Hotlline</b><hr><p>@config.Hotline</p></li>
+                </ul>
+                <ul class="ul-reset social-contact mt-2">
+                    <li><a href="@config.Facebook"><i class="fab fa-facebook-f"></i></a></li>
+                    <li><a id="twitter" href="@config.Twitter"><i class="fab fa-twitter"></i></a></li>
+                    <li><a id="instagram" href="@config.Instagram"><i class="fab fa-instagram"></i></a></li>
+                    <li><a id="linkedin" href="@config.Linkedin"><i class="fab fa-linkedin-in"></i></a></li>
+                </ul>
+            </div>
+        </div>
+        @Html.Action("ContactForm")
+        @if (config.GoogleMap != null)
+        {
+            <div class="embed-responsive embed-responsive-16by9 map mt-lg-5 mt-0">
+                @Html.Raw(config.GoogleMap)
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,43 @@
+﻿@using BinhTung.Models
+@{
+    var config = (ConfigSite)HttpContext.Current.Application["ConfigSite"];
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <meta name="description" content="@Html.Raw(ViewBag.Description)" />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="@ViewBag.Canonical" />
+    <link rel="shortcut icon" href="~/favicon.png">
+    <meta property="og:locale" content="vi_VN">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="@Html.Raw(ViewBag.Title)">
+    <meta property="og:description" content="@Html.Raw(ViewBag.Description)">
+    <meta property="og:url" content="@ViewBag.Canonical">
+    <meta property="og:site_name" content="@Html.Raw(ViewBag.Title)">
+    <meta property="og:image" content="@(ViewBag.ImagShare ?? "https://"+Request.Url?.Host+"/content/images/logo.png")" />
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @if (config.GoogleAnalytics != null)
+    {
+        @Html.Raw(config.GoogleAnalytics)
+    }
+</head>
+<body>
+    @Html.Action("Header", "Home")
+    @RenderBody()
+    @Html.Action("Footer", "Home")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v8.0" nonce="di1pgAbX"></script>
+    @if (config.LiveChat != null)
+    {
+        @Html.Raw(config.LiveChat)
+    }
+</body>
+</html>

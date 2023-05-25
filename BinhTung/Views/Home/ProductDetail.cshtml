@@ -1,0 +1,171 @@
+﻿@model BinhTung.ViewModel.ProductDetailViewModel
+@using BinhTung.Models
+@{
+    var config = (ConfigSite)HttpContext.Current.Application["ConfigSite"];
+}
+@{
+    ViewBag.Title = Model.Product.TitleMeta ?? Model.Product.Name;
+    ViewBag.Description = Model.Product.DescriptionMeta ?? Model.Product.Description;
+
+    ViewBag.Canonical = Request.Url?.GetLeftPart(UriPartial.Authority) + Url.Action("ProductDetail", new { url = Model.Product.Url });
+
+    if (Model.Product.ListImage != null)
+    {
+        ViewBag.ImagShare = Request.Url?.GetLeftPart(UriPartial.Authority) + Path.Combine("/images/products/", Model.Product.ListImage.Split(',')[0]);
+    }
+}
+<div class="bg-breadcrumb">
+    <div class="container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index")"><i class="fal fa-home mr-1"></i> Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("ProductCategory", new { url = Model.Product.ProductCategory.Url })">@Model.Product.ProductCategory.CategoryName</a></li>
+            <li class="breadcrumb-item active" aria-current="page"> @Model.Product.Name</li>
+        </ol>
+    </div>
+</div>
+<div class="container py-lg-4 py-3">
+    <div class="row">
+        <div class="col-sm-12 col-lg-9">
+            <div class="box-border">
+                <div class="row">
+                    <div class="col-sm-12 col-lg-6">
+                        @if (Model.Product.ListImage != null)
+                        {
+                            var arr = Model.Product.ListImage.Split(',');
+                            <div class="product-gallery">
+                                @foreach (var img in arr)
+                                {
+                                    <a href="@Path.Combine("/images/products/", img)" data-fancybox="gallery">
+                                        <img class="img-fluid" data-lazy="@Path.Combine("/images/products/", img)?w=500&amp;h=500" alt="@Model.Product.Name" />
+                                    </a>
+                                }
+                            </div>
+                            if (arr.Length > 0)
+                            {
+                                <div class="thumb-nav">
+                                    @foreach (var img in arr)
+                                    {
+                                        <img class="img img--thumb" src="@Path.Combine("/images/products/", img)?w=100&h=100" alt="@Model.Product.Name" />
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                    <div class="col-sm-12 col-lg-6 border-left">
+                        <div class="product-info pt-lg-0 pt-3">
+                            <h1 class="product-info__name">@Model.Product.Name</h1>
+                            <ul class="ul-block mb-3">
+                                <li>
+                                    <span>Danh mục:</span> <a href="@Url.Action("ProductCategory", new {url = Model.Product.ProductCategory.Url})"> @Model.Product.ProductCategory.CategoryName</a>
+                                </li>
+                                @if (Model.Product.Description != null)
+                                {
+                                    <li><span>Mô tả sản phẩm: </span> @Model.Product.Description</li>
+                                }
+                            </ul>
+                            <div class="double-btn">
+                                <a href="tel:@config.Hotline" class="btn btn-style px-3">
+                                    <img class="img-fluid" src="~/Content/images/logo-icon/phone-call.svg" alt="" /> Tư vấn trực tiếp
+                                </a>
+                                <a data-toggle="modal" data-target="#contact-buy" href="javascript:;" class="btn btn-style ml-lg-2 ml-1 px-3"><i class="fas fa-paper-plane mr-2"></i> Liên hệ</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @if (Model.Product.Body != null)
+            {
+                <div class="box-border content-detail mt-3">
+                    @Html.Raw(Model.Product.Body)
+                </div>
+            }
+        </div>
+        <div class="col-sm-12 col-lg-3 pl-lg-0">
+            <div class="title-category mb-lg-4 mb-3">
+                Sản phẩm liên quan
+            </div>
+            <div class="box-border product-another">
+                @if (Model.Products.Any())
+                {
+                    foreach (var product in Model.Products)
+                    {
+                        <div class="mb-3">
+                            @Html.Partial("_ItemProduct", product)
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="contact-buy" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="title" id="orderModalLabel">Liên hệ đặt hàng</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><i class="fal fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="orderForm">
+                    @Html.ValidationSummary(true)
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="ProductName" value="@Model.Product.Name" />
+                    <input type="hidden" name="ProductUrl" value="@Url.Action("ProductDetail", new{proId  = Model.Product.Id, name = Html.ConvertToUnSign(Model.Product.Name)})" />
+                    @if (Model.Product.ListImage != null)
+                    {
+                        <input type="hidden" name="ProductImg" value="@Model.Product.ListImage.Split(',')[0]" />
+                    }
+                    <div class="info-product">
+                        <p>
+                            Sản phẩm: <strong>@Model.Product.Name</strong><br>
+                        </p>
+                    </div>
+                    <hr>
+                    <strong class="title--child">Thông tin của bạn</strong>
+                    <div class="wrapper mt-3">
+                        <fieldset class="formRow">
+                            <div class="formRow--item">
+                                <label for="firstname" class="formRow--input-wrapper js-inputWrapper">
+                                    <input class="formRow--input js-input" required="" maxlength="50" placeholder="Họ và tên" id="Fullname" name="Fullname" type="text" value="">
+                                    <span class="placeholder">Họ và tên</span>
+                                </label>
+                            </div>
+                            <div class="formRow--item mt-lg-4 mt-2">
+                                <label for="firstname" class="formRow--input-wrapper js-inputWrapper">
+                                    <input class="formRow--input js-input" required="" maxlength="150" id="Address" name="Address" placeholder="Địa chỉ" type="text" value="">
+                                    <span class="placeholder">Địa chỉ</span>
+                                </label>
+                            </div>
+                            <div class="formRow--item mt-lg-4 mt-2">
+                                <label for="firstname" class="formRow--input-wrapper js-inputWrapper">
+                                    <input class="formRow--input js-input" id="Mobile" required="" name="Mobile" placeholder="Số điện thoại" type="text" value="">
+                                    <span class="placeholder">Số điện thoại</span>
+                                </label>
+                            </div>
+                            <div class="formRow--item mt-lg-4 mt-2">
+                                <label for="firstname" class="formRow--input-wrapper js-inputWrapper">
+                                    <input type="email" name="Email" required="" maxlength="50" class="formRow--input js-input" placeholder="Email của bạn" />
+                                    <span class="placeholder">Email của bạn</span>
+                                </label>
+                            </div>
+                            <div class="formRow--item mt-lg-4 mt-2">
+                                <label for="firstname" class="formRow--input-wrapper js-inputWrapper">
+                                    <textarea name="Content" class="formRow--input js-input" maxlength="500" rows="4" placeholder="Ghi chú, lời nhắn"></textarea>
+                                    <span class="placeholder">Ghi chú, lời nhắn</span>
+                                </label>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="form-group form-row float-right">
+                        <button type="submit" class="btn btn-style btn-style--cart"><i class="fa fa-check"></i> GỬI YÊU CẦU</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        ProductDetailJs();
+    </script>
+}

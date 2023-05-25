@@ -1,0 +1,67 @@
+﻿@model BinhTung.ViewModel.FooterViewModel
+@using BinhTung.Models
+@{
+    var config = (ConfigSite)HttpContext.Current.Application["ConfigSite"];
+}
+<footer>
+    <div class="container">
+        <div class="row mt-3 mt-lg-5">
+            <div class="col-sm-12 col-lg-3">
+                <div class="title-ft">
+                    BẢN ĐỒ
+                </div>
+                @if (config.GoogleMap != null)
+                {
+                    <div class="embed-responsive embed-responsive-16by9">
+                        @Html.Raw(config.GoogleMap)
+                    </div>
+                }
+            </div>
+            <div class="col-sm-12 col-lg-4 pl-lg-4">
+                <div class="title-ft">
+                    CƠ SỞ SẢN XUẤT
+                </div>
+                @if (config.InfoFooter != null)
+                {
+                    @Html.Raw(config.InfoFooter)
+                }
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-2 pl-lg-5">
+                <div class="title-ft">
+                    THÔNG TIN
+                </div>
+                <ul class="ul-block">
+                    <li><a href="@Url.Action("Index")"> Trang chủ</a></li>
+                    @foreach (var category in Model.ArticleCategories)
+                    {
+                        <li><a href="@Url.Action("ArticleCategory", new { url = category.Url })"> @category.CategoryName</a></li>
+                    }
+                    <li><a href="@Url.Action("Contact")"> Liên hệ</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-3">
+                <div class="title-ft">
+                    CHÍNH SÁCH
+                </div>
+                @if (Model.Articles.Any())
+                {
+                    <ul class="ul-block">
+                        @foreach (var article in Model.Articles)
+                        {
+                            <li><a href="@Url.Action("ArticleDetail", new { url = article.Url })"> @article.Subject</a></li>
+                        }
+                    </ul>
+                }
+                <ul class="ul-reset social mt-3">
+                    <li><a href="@config.Facebook"><i class="fab fa-facebook-f"></i></a></li>
+                    <li><a id="twitter" href="@config.Twitter"><i class="fab fa-twitter"></i></a></li>
+                    <li><a id="instagram" href="@config.Instagram"><i class="fab fa-instagram"></i></a></li>
+                    <li><a id="linkedin" href="@config.Linkedin"><i class="fab fa-linkedin-in"></i></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="copyright border-top text-center mt-3 py-lg-3 py-2">
+        ©binhtungstone.com. Designed by Developer-An
+    </div>
+</footer>

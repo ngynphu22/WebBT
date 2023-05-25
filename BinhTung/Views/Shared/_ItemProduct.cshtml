@@ -1,0 +1,12 @@
+﻿@model BinhTung.Models.Product
+<div class="box">
+    <a href="@Url.Action("ProductDetail", new { url = Model.Url })" class="box__name truncate-h" data-line="1">@Model.Name</a>
+    <a href="@Url.Action("ProductDetail", new { url = Model.Url })">
+        @if (Model.ListImage != null)
+        {
+            <div class="item-img">
+                <img class="img-fluid img img--product" src="@Path.Combine("/images/products/", Model.ListImage.Split(',')[0])" alt="@Model.Name" />
+            </div>
+        }
+    </a>
+</div>

@@ -1,0 +1,85 @@
+﻿@model BinhTung.ViewModel.HeaderViewModel
+@using BinhTung.Models
+@{
+    var config = (ConfigSite)HttpContext.Current.Application["ConfigSite"];
+}
+<div class="header-top">
+    <div class="container">
+        <ul class="ul-reset">
+            <li><a href="@config.Facebook"><i class="fab fa-facebook-f"></i></a></li>
+            <li><a href="@config.Twitter"><i class="fab fa-twitter"></i></a></li>
+            <li><a href="@config.Instagram"><i class="fab fa-instagram"></i></a></li>
+            <li><a href="@config.Linkedin"><i class="fab fa-linkedin-in"></i></a></li>
+        </ul>
+        <div>Mỏ khai thác đá tự nhiên trữ lượng lớn tại Thanh Hóa</div>
+    </div>
+</div>
+<div class="header-center">
+    <div class="container">
+        <a href="@Url.Action("Index")">
+            <img class="img-logo" src="~/Content/images/logo-icon/logo.png" alt="logo" />
+        </a>
+        <form action="@Url.Action("Search")" method="get" class="header-form">
+            <i class="far fa-chevron-down"></i>
+            <select class="custom-select" name="categoryId">
+                <option value="">Tất cả</option>
+                @foreach (var category in Model.ProductCategories.Where(l => l.ParentId == null))
+                {
+                    <option value="@category.Id">@category.CategoryName</option>
+                }
+            </select>
+            <input type="text" name="keywords" required="" class="form-control  mr-sm-2" autocomplete="off" placeholder="Tìm kiếm bằng từ khóa..." value="@Request.QueryString["keywords"]">
+            <button type="submit" title="Search" class="btn">
+                <i class="far fa-search"></i>
+            </button>
+        </form>
+        <div class="info-contact">
+            <a href="tel:@config.Hotline" id="hotline">@config.Hotline</a>
+            <a href="mailto:@config.Email">@config.Email</a>
+        </div>
+        <div class="bars-mobile">
+            <i class="fal fa-bars"></i>
+            <i class="fal fa-times"></i>
+        </div>
+    </div>
+</div>
+<div class="header-bottom">
+    <div class="container">
+        <ul class="ul-reset menu">
+            <li><a href="@Url.Action("Index")">Trang chủ</a></li>
+            @foreach (var category in Model.ProductCategories.Where(l => l.ParentId == null))
+            {
+                <li>
+                    <a href="@Url.Action("ProductCategory", new { url = category.Url })"> @category.CategoryName</a>
+                    @if (Model.ProductCategories.Any(l => l.ParentId == category.Id))
+                    {
+                        <ul class="sub-menu">
+                            @foreach (var child in Model.ProductCategories.Where(l => l.ParentId == category.Id))
+                            {
+                                <li><a class="stretched-link" href="@Url.Action("ProductCategory", new { url = child.Url })"> @child.CategoryName</a></li>
+                            }
+                        </ul>
+                    }
+                </li>
+            }
+            @foreach (var category in Model.ArticleCategories.Where(l => l.ParentId == null))
+            {
+                <li>
+                    <a href="@Url.Action("ArticleCategory", new { url = category.Url })"> @category.CategoryName</a>
+                    @if (Model.ArticleCategories.Any(l => l.ParentId == category.Id))
+                    {
+                        <ul class="sub-menu">
+                            @foreach (var child in Model.ArticleCategories.Where(l => l.ParentId == category.Id))
+                            {
+                                <li><a class="stretched-link" href="@Url.Action("ArticleCategory", new { url = child.Url })"> @child.CategoryName</a></li>
+                            }
+                        </ul>
+                    }
+                </li>
+            }
+            <li>
+                <a href="@Url.Action("Contact")">Liên hệ</a>
+            </li>
+        </ul>
+    </div>
+</div>
